@@ -4,20 +4,18 @@ require_once "vendor/autoload.php";
 
 use gburtini\Distributions\Beta;
 
-
-
 class ThompsonSempl
 {
 
     private $thomas = [];
 
     public function __construct(
-        array $players = ['A1', 'A2', 'A3', 'A4'],
-        array|int $observations = 200,
-        float $a = 1,
-        float $b = 1
+        array $observations,
+        float $a = 0.5,
+        float $b = 0.5
     ) {
-        $this->players = $players;
+
+        $this->players = array_keys($observations);
         $this->observations = $observations;
         $this->a = $a;
         $this->b = $b;
@@ -32,20 +30,20 @@ class ThompsonSempl
          * В вашем случае это заголовки записей и их клики = 1 (0 = отсуствие клика) при каждом просмотре
          */
 
-        $this->data = $this->generateStatic($this->players, $observations);
+        $this->max = $this->generateStatic($this->players, $observations)['max'];
     }
 
 
-    public function predict()
+    public function predict(): void
     {
         $this->thomas = [
             'rewards' => array_fill_keys($this->players, 0),
             'penalties' => array_fill_keys($this->players, 0),
             'total_reward' => 0,
-            'selected_records' => []
+            'selected_player' => []
         ];
 
-        for ($n = 0; $n < $this->observations; $n++) {
+        for ($n = 0; $n < $this->max; $n++) {
             $bandit = 0;
             $beta_max = 0;
             foreach ($this->players as $key => $value) {
@@ -60,15 +58,18 @@ class ThompsonSempl
                     $bandit = $value;
                 }
             }
-            $this->thomas['selected_records'][] = $bandit;
+            $this->thomas['selected_player'][] = $bandit;
 
-            $this->thomas['rewards'][$bandit] += $this->data[$bandit][$n];
-            $this->thomas['penalties'][$bandit] += (1 - $this->data[$bandit][$n]);
+            $this->thomas['rewards'][$bandit] += $this->observations[$bandit][$n] ?? 0;
+            $this->thomas['penalties'][$bandit] += (1 - ($this->observations[$bandit][$n] ?? 0));
 
-            $this->thomas['total_reward'] += $this->data[$bandit][$n];
+            $this->thomas['total_reward'] += $this->observations[$bandit][$n] ?? 0;
         }
+    }
 
-        return $this->thomas;
+    public function getRevards()
+    {
+        return $this->thomas['rewards'];
     }
 
     /**
@@ -76,15 +77,16 @@ class ThompsonSempl
      * @param int $count
      * @return array
      */
-    public function generateStatic(array $players, int $count): array
+    public function generateStatic(array $players, array $count): array
     {
-        if (is_array($count)) {
-        }
-        foreach ($players as $value) {
-            $out[$value] = $this->innerRand($count);
-        }
+        if (is_array($count))
+            foreach ($players as $value) {
+                $max[] = count($count[$value]);
+                $out[$value] = $count[$value];
+            }
 
-        return $out;
+
+        return ['max' => max($max), 'obs' => $out];
     }
 
     /**
@@ -104,63 +106,25 @@ class ThompsonSempl
     }
 }
 
-$ob = new ThompsonSempl();
+$obs = [
+    'A1' => [1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1,],
+    'A2' => [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+    'A3' => [1],
+    'A4' => [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+];
 
-print_r($ob->predict());
+$thomas = new ThompsonSempl($obs);
 
-// function randarr($N, $min = 0, $max = 1)
-// {
-//     return array_map(
-//         function () use ($min, $max) {
-//             return rand($min, $max);
-//         },
-//         array_pad([], $N, 0)
-//     );
-// }
+$thomas->predict();
 
-// for ($i = 0; $i < 5; $i++) {
-//     $data[$i] = randarr(201);
-// }
+print_r($thomas->getRevards());
 
-// $observ = 200;
-// $machines = 5;
-// $select_machine = [];
-
-// $rewards = array_fill(0, $machines, 0);
-// $penalties = array_fill(0, $machines, 0);
-// $total_reward = 0;
-// $click = array_fill(0, $machines, 0);
-// srand(1);
-
-// for ($n = 0; $n < $observ; $n++) {
-//     $bandit = 0;
-//     $beta_max = 0;
-
-//     for ($i = 0; $i < $machines; $i++) {
-
-//         $bb = new Beta($rewards[$i] + 1, $penalties[$i] + 1);
-//         $beta_d = $bb->rand();
-
-//         if ($beta_d > $beta_max) {
-//             $beta_max = $beta_d;
-//             $bandit = $i;
-//         }
-//         $click[$i] += $data[$i][$n];
-//     }
-
-//     $select_machine[] = $bandit;
-
-//     $reward = $data[$bandit][$n];
-
-//     if ($reward == 1)
-//         $rewards[$bandit] = $rewards[$bandit] + 1;
-//     else
-//         $penalties[$bandit] = $penalties[$bandit] + 1;
-
-//     $total_reward = $total_reward + $reward;
-// }
-
-// // результаты
-
-
-// print_r($rewards);
+/** 
+ * Array
+ *(
+ *    [A1] => 7
+ *    [A2] => 1
+ *    [A3] => 2
+ *    [A4] => 13
+ *)
+ */
