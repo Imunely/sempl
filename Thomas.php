@@ -36,24 +36,22 @@ class ThompsonSempl
     }
 
 
-
-
     public function predict()
     {
         $this->thomas = [
-            'rewards' => array_fill_keys($this->players, 1),
-            'penalties' => array_fill_keys($this->players, 1),
+            'rewards' => array_fill_keys($this->players, 0),
+            'penalties' => array_fill_keys($this->players, 0),
             'total_reward' => 0,
             'selected_records' => []
         ];
+
         for ($n = 0; $n < $this->observations; $n++) {
             $bandit = 0;
             $beta_max = 0;
-
             foreach ($this->players as $key => $value) {
                 $bb = new Beta(
-                    $this->thomas['rewards'][$value] ?? 0 + $this->a,
-                    $this->thomas['penalties'][$value] ?? 0 + $this->b
+                    ($this->thomas['rewards'][$value] ?? 0) + $this->a,
+                    ($this->thomas['penalties'][$value] ?? 0) + $this->b
                 );
                 $beta_d = $bb->rand();
 
@@ -62,12 +60,9 @@ class ThompsonSempl
                     $bandit = $value;
                 }
             }
-
             $this->thomas['selected_records'][] = $bandit;
 
-
             $this->thomas['rewards'][$bandit] += $this->data[$bandit][$n];
-
             $this->thomas['penalties'][$bandit] += (1 - $this->data[$bandit][$n]);
 
             $this->thomas['total_reward'] += $this->data[$bandit][$n];
