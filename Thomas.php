@@ -13,7 +13,7 @@ class ThompsonSempl
 
     public function __construct(
         array $players = ['A1', 'A2', 'A3', 'A4'],
-        array|int $observations = 100,
+        array|int $observations = 200,
         float $a = 1,
         float $b = 1
     ) {
@@ -40,17 +40,12 @@ class ThompsonSempl
 
     public function predict()
     {
-        $inner = array_fill(0, count($this->players), 0);
-
         $this->thomas = [
-            'rewards' => [],
-            'penalties' => [],
+            'rewards' => array_fill_keys($this->players, 1),
+            'penalties' => array_fill_keys($this->players, 1),
             'total_reward' => 0,
             'selected_records' => []
         ];
-
-        $click = [];
-
         for ($n = 0; $n < $this->observations; $n++) {
             $bandit = 0;
             $beta_max = 0;
@@ -62,22 +57,18 @@ class ThompsonSempl
                 );
                 $beta_d = $bb->rand();
 
-                if ($beta_d > $beta_max) {
+                if ($beta_d >= $beta_max) {
                     $beta_max = $beta_d;
                     $bandit = $value;
                 }
-
-                //isset($click[$key]) ? $click[$key] += $this->data[$key][$n] : $click[$key] = 0;
             }
 
             $this->thomas['selected_records'][] = $bandit;
 
-            //$reward = $this->data[$bandit][$n];
 
-            if ($this->data[$bandit][$n] == 1)
-                !isset($this->thomas['rewards'][$bandit]) ? $this->thomas['rewards'][$bandit] = 1 : ++$this->thomas['rewards'][$bandit];
-            else
-                !isset($this->thomas['penalties'][$bandit]) ? $this->thomas['penalties'][$bandit] = 1 : ++$this->thomas['penalties'][$bandit];
+            $this->thomas['rewards'][$bandit] += $this->data[$bandit][$n];
+
+            $this->thomas['penalties'][$bandit] += (1 - $this->data[$bandit][$n]);
 
             $this->thomas['total_reward'] += $this->data[$bandit][$n];
         }
