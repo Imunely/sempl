@@ -1,5 +1,6 @@
 <?php
 
+
 require_once "vendor/autoload.php";
 
 use gburtini\Distributions\Beta;
@@ -11,9 +12,10 @@ class ThompsonSempl
 
     public function __construct(
         array $observations,
-        float $a = 0.5,
-        float $b = 0.5
-    ) {
+        float $a = 1,
+        float $b = 1
+    ) 
+    {
 
         $this->players = array_keys($observations);
         $this->observations = $observations;
@@ -107,17 +109,35 @@ class ThompsonSempl
 }
 
 $obs = [
-    'A1' => [1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1,],
-    'A2' => [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-    'A3' => [1],
-    'A4' => [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    'A1'=>[1000,300],
+    'A2'=>[300,100],
+    'A3'=>[10000, 4]
 ];
 
-$thomas = new ThompsonSempl($obs);
+function innerRand(int $count, int $min = 0, int $max = 1)
+{
+    return array_map(
+        function () use ($min, $max) {
+            return rand($min, $max);
+        },
+        array_pad([], $count, 0)
+    );
+}
+for ($i = 0; $i < 10000; $i++) {
+    $out[$i] = innerRand(500);
+}
+// $obs = [
+//     'A1' => [1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1,],
+//     'A2' => [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+//     'A3' => [1],
+//     'A4' => [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+// ];
 
-$thomas->predict();
+// $thomas = new ThompsonSempl($out);
 
-print_r($thomas->getRevards());
+// $thomas->predict();
+
+//$thomas->getRevards();
 
 /** 
  * Array
