@@ -42,7 +42,7 @@ $th->predict(true);
 $$μ=E(X) = alpha/(alpha+beta)$$
 **и дисперсии**
 
-$$alpha*beta/((alpha+beta)^2*(alpha*beta+1))$$
+$$ D = alpha*beta/((alpha+beta)^2*(alpha*beta+1))$$
 
 где $$alpha,betta ∈ [1,n], n=R^+$$
 
