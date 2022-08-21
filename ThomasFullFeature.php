@@ -1,9 +1,4 @@
 <?php
-ini_set('memory_limit', -1);
-
-$start = microtime(true);
-$memory = memory_get_usage();
-
 
 class ThompsonSempl
 {
@@ -88,25 +83,3 @@ class ThompsonSempl
         }
     }
 }
-
-for ($i = 0; $i < 100000; $i++) {
-    $out[] = [rand(10000, 1000000), rand(0, 9999)];
-}
-
-$th = new ThompsonSempl($out);
-
-$th->predict(true);
-
-$memory = memory_get_usage() - $memory;
-$time = microtime(true) - $start;
-
-$i = 0;
-while (floor($memory / 1024) > 0) {
-    $i++;
-    $memory /= 1024;
-}
-
-$name = array('байт', 'КБ', 'МБ');
-$memory = round($memory, 2) . ' ' . $name[$i];
-
-echo round($time, 4) . ' сек. / ' . $memory;
