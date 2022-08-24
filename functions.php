@@ -21,6 +21,10 @@ function getcsv()
     $out = [];
     if (($handle = fopen("/Users/emmanyel/Downloads/sampling.csv", "r")) !== FALSE) {
         while (($data = fgetcsv($handle, 0, ';')) !== FALSE) {
+            if ($first) {
+                $first = false;
+                continue;
+            }
             $out[$data[0]] = [$data[1], $data[2]];
         }
         fclose($handle);

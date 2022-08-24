@@ -9,7 +9,7 @@ class ThompsonSempl
     ) {
         $this->observations = $observations;
 
-        if ($a < 1 || $b < 1) {
+        if ($a <= 0 || $b <= 0) {
             throw new \InvalidArgumentException("Alpha and beta must be greater than 0.");
         }
 
@@ -24,11 +24,15 @@ class ThompsonSempl
     public function predict(bool $sort = false): array
     {
         foreach ($this->observations as $player => $features) {
-            $out[$player] = $this->beta(
-                $features[1] + $this->a,
-                $features[0] - $features[1] + $this->b
-            );
+            if ($features[1] > $features[0]) {
+                $features[1] = $features[0];
+            }
+            
+            $alpha = $features[1] + $this->a;
+            $beta = ($features[0] - $features[1] + $this->b);
+            $out[$player] = $alpha / ($alpha + $beta);
         }
+
         !$sort ?: arsort($out);
 
         return $out;
@@ -80,6 +84,27 @@ class ThompsonSempl
                 $u = rand() / getrandmax();
             }
             return -log($u) * $beta;
+        } else { // 0 < alpha < 1
+            // Uses ALGORITHM GS of Statistical Computing - Kennedy & Gentle
+            while (true) {
+                $u3 = rand() / getrandmax();
+                $b = (M_E + $alpha) / M_E;
+                $p = $b * $u3;
+                if ($p <= 1.0) {
+                    $x = pow($p, (1.0 / $alpha));
+                } else {
+                    $x = log(($b - $p) / $alpha);
+                }
+                $u4 = rand() / getrandmax();
+                if ($p > 1.0) {
+                    if ($u4 <= pow($x, ($alpha - 1.0))) {
+                        break;
+                    }
+                } elseif ($u4 <= exp(-$x)) {
+                    break;
+                }
+            }
+            return $x * $beta;
         }
     }
 }

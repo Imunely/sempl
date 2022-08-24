@@ -30,8 +30,10 @@ $start = microtime(true);
 
 $ar = getcsv();
 
-$thompson = new ThompsonSempl(['a' => $ar[3605413]]);
-print_r($thompson->predict(true));
+$ar[0] = [1000, 800];
+
+$thompson = new ThompsonSempl($ar);
+print_r(array_slice($thompson->predict(true), 0, 40, true));
 
 
 /**
