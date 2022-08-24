@@ -24,10 +24,10 @@ class ThompsonSempl
     public function predict(bool $sort = false): array
     {
         foreach ($this->observations as $player => $features) {
-            $out[$player] = round($this->beta(
+            $out[$player] = $this->beta(
                 $features[1] + $this->a,
                 $features[0] - $features[1] + $this->b
-            ), 4);
+            );
         }
         !$sort ?: arsort($out);
 

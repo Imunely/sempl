@@ -11,26 +11,27 @@ require_once 'functions.php';
 ini_set('memory_limit', -1);
 
 
-$count = [
-    '100K' => 100000, '300K' => 300000,
-    '600K' => 600000, '1M' => 1000000
-];
+// $count = [
+//     '100K' => 100000, '300K' => 300000,
+//     '600K' => 600000, '1M' => 1000000
+// ];
 
-/**
- * Генерируем случайную выборку
- */
-for ($i = 0; $i < $count['300K']; $i++) {
-    $records[] = [rand(10000, 1000000), rand(0, 9999)];
-}
+// /**
+//  * Генерируем случайную выборку
+//  */
+// for ($i = 0; $i < $count['100K']; $i++) {
+//     $records[] = [rand(10000, 1000000), rand(0, 10000)];
+// }
 
 /**
  * Текущий показатель времени
- */ 
+ */
 $start = microtime(true);
 
+$ar = getcsv();
 
-$thompson = new ThompsonSempl($records);
-$thompson->predict(true);
+$thompson = new ThompsonSempl(['a' => $ar[3605413]]);
+print_r($thompson->predict(true));
 
 
 /**

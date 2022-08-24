@@ -48,7 +48,7 @@ $$μ=E(X) = alpha/(alpha+beta)$$
 
 $$ D = alpha * beta/((alpha+beta)^2*(alpha*beta+1))$$
 
-где $$alpha,betta ∈ [1,n], n=R^+, alpha<=beta$$
+где $$alpha,betta ∈ [1,n], n=R^+$$
 
 ### Тестирование
 
