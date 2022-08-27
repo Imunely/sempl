@@ -9,7 +9,7 @@ class Ucb1 implements Bandit
 
     public function __construct(
         array $samples,
-        $koef = 0.3,
+        float $koef = 0.3,
         int $start_count_views = 1
     ) {
         $this->samples = $samples;
