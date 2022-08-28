@@ -22,7 +22,8 @@ class Ucb1 implements Bandit
 
 
     /**
-     * weight = Sample_Mean + koef √(logN / n)
+     * weight = Sample_Mean + koef √(log(N) / n)
+     * N - all records
      * Go to https://hsto.org/getpro/habr/upload_files/04d/206/497/04d206497897931be487004430dde8e9.png
      * 
      * @param bool $sort
